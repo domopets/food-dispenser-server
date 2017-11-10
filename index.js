@@ -4,9 +4,16 @@ const execa = require("execa")
 const path = require("path")
 const a = require("awaiting")
 
+const internalIp = require("os").networkInterfaces().wlan0[0].address
+
+console.log(internalIp)
+
 const port = 8889
 const ad = mdns.createAdvertisement(mdns.tcp("http"), port, {
   name: "DOMOPETS_FoodDispenser",
+  txtRecord: {
+    url: `${internalIp}:${port}`,
+  },
 })
 
 const hx711Path = path.join(__dirname, "..", "hx711py")

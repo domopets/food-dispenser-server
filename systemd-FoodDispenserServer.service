@@ -1,0 +1,22 @@
+# Copy this file to /etc/systemd/system/FoodDispenserServer.service and then
+#     sudo systemctl start FoodDispenserServer.service
+# and to start on boot:
+#     sudo systemctl enable FoodDispenserServer.service
+# To consult the log : sudo journalctl -u FoodDispenserServer
+
+[Unit]
+Description=Launch the water dispenser server
+
+[Service]
+ExecStart=/home/pi/food-dispenser-server/start.sh
+WorkingDirectory=/home/pi/food-dispenser-server
+User=pi
+Group=daemon
+Nice=10
+SyslogIdentifier=FoodDispenserServer
+StandardOutput=syslog
+Restart=on-failure
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

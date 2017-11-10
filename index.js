@@ -56,7 +56,7 @@ let dispensingFood = false
 async function dispenseFood() {
   dispensingFood = true
   await execa(openFoodCmd)
-  await a.delay(1000)
+  await a.delay(200)
   await execa(closeFoodCmd)
   dispensingFood = false
 }

@@ -6,9 +6,7 @@ const hx711Path = path.join(__dirname, "..", "hx711py")
 const tare_cmd = path.join(hx711Path, "tare")
 const measure_cmd = path.join(hx711Path, "measure")
 
-const socket = require("socket.io-client")("http://192.168.1.11:3000", {
-  transports: ["websocket"],
-})
+const socket = require("socket.io-client")("https://domopets.herokuapp.com/")
 
 async function tare() {
   const {stdout} = await execa(tare_cmd)

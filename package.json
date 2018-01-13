@@ -6,7 +6,6 @@
   "dependencies": {
     "awaiting": "^3.0.0",
     "execa": "^0.8.0",
-    "mdns": "^2.3.3",
-    "socket.io": "^2.0.3"
+    "socket.io-client": "^2.0.4"
   }
 }

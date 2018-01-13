@@ -1,24 +1,14 @@
-const io = require("socket.io")()
-const mdns = require("mdns")
 const execa = require("execa")
 const path = require("path")
 const a = require("awaiting")
 
-const internalIp = require("os").networkInterfaces().wlan0[0].address
-
-console.log(internalIp)
-
-const port = 8889
-const ad = mdns.createAdvertisement(mdns.tcp("http"), port, {
-  name: "DOMOPETS_FoodDispenser",
-  txtRecord: {
-    url: `${internalIp}:${port}`,
-  },
-})
-
 const hx711Path = path.join(__dirname, "..", "hx711py")
 const tare_cmd = path.join(hx711Path, "tare")
 const measure_cmd = path.join(hx711Path, "measure")
+
+const socket = require("socket.io-client")("http://192.168.1.11:3000", {
+  transports: ["websocket"],
+})
 
 async function tare() {
   const {stdout} = await execa(tare_cmd)
@@ -41,7 +31,10 @@ tare().then(async val => {
       tareTriggered = false
     }
     const measureValue = await measure(tareVal)
-    io.emit("measure", measureValue)
+    socket.emit("dispatch", {
+      action: "measure",
+      payload: measureValue,
+    })
     console.log(measureValue)
     setTimeout(measureLoop, 200)
   }
@@ -61,11 +54,8 @@ async function dispenseFood() {
   dispensingFood = false
 }
 
-io.on("connection", socket => {
-  socket.on("tare", () => (tareTriggered = true))
-  socket.on("tareTriggered", () => io.emit("tareTriggered", tareTriggered))
-  socket.on("dispenseFood", () => dispenseFood())
-  socket.on("dispensingFood", () => io.emit("dispensingFood", dispensingFood))
+socket.on("connect", () => {
+  socket.emit("type", "FOOD")
 })
-
-io.listen(port)
+socket.on("tare", () => (tareTriggered = true))
+socket.on("dispenseFood", () => dispenseFood())

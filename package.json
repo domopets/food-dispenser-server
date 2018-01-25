@@ -6,6 +6,7 @@
   "dependencies": {
     "awaiting": "^3.0.0",
     "execa": "^0.8.0",
+    "mongorito": "^3.0.4",
     "socket.io-client": "^2.0.4"
   }
 }

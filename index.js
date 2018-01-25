@@ -7,6 +7,8 @@ const hx711Path = path.join(__dirname, "..", "hx711py")
 const tare_cmd = path.join(hx711Path, "tare")
 const measure_cmd = path.join(hx711Path, "measure")
 
+const cron = require("node-cron")
+
 const socket = require("socket.io-client")("https://domopets.herokuapp.com/")
 const db = new Database("localhost/weight")
 class Weight extends Model {}
@@ -121,3 +123,24 @@ socket.on("connect", () => {
 })
 socket.on("tare", () => (tareTriggered = true))
 socket.on("dispenseFood", () => dispenseFood())
+
+let currentTask = null
+socket.on("schedule", ({h, m}) => {
+  console.log(`schedule h: ${h}, m: ${m}`)
+  if (currentTask) {
+    currentTask.destroy()
+  }
+  currentTask = cron.schedule(
+    `${m} ${h - 1} * * *`,
+    () => {
+      dispenseFood()
+      console.log("task running")
+    },
+    true,
+  )
+})
+socket.on("unschedule", () => {
+  console.log("unschedule")
+  currentTask.destroy()
+  currentTask = null
+})
